@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>糖果题动画讲解 · 给完一样多</title>
+<title>还差几个就一样多 · 题型动画讲解</title>
 <style>
   * { box-sizing: border-box; }
   body {
@@ -47,10 +47,6 @@
   }
   .candy.given { outline:3px solid #4a90d9; outline-offset:2px; border-radius:50%; }
   .question-mark { font-size:34px; color:#bbb; font-weight:bold; }
-  .fly { position:fixed; z-index:99; width:30px; height:30px; border-radius:50%;
-    display:inline-flex; align-items:center; justify-content:center; font-size:26px;
-    transition: transform .85s cubic-bezier(.4,1.3,.5,1); pointer-events:none;
-    filter: drop-shadow(0 3px 4px rgba(0,0,0,.25)); }
   .controls { text-align:center; margin-top:14px; }
   button {
     font-size:15px; border:none; border-radius:20px; padding:9px 18px; margin:4px;
@@ -129,16 +125,16 @@
 </head>
 <body>
 
-<h1>🍬 糖果题动画讲解</h1>
-<div class="lead">题型：给完之后两人一样多，求原来有几个</div>
+<h1>📐 还差几个就一样多</h1>
+<div class="lead">题型：A 比 B 多，B 再补一些就和 A 一样多，求 B 现在有几个</div>
 
 <!-- 顶部示例讲解舞台（由组件生成） -->
 <div class="stage" id="stageRoot"></div>
 
 <div class="practice">
   <h2>📝 同类训练题（10 道，各种生活场景）</h2>
-  <div class="hint">都是「A 给 B 一些后，两人一样多」的题型。点每题的「播放讲解过程」，就在这道题下面展开动画讲解（含算式），再点一次收起。</div>
-  <div class="formula">小口诀：<b>B原来 = A原来 − 给出 − 给出</b>（把送出去的那份减两次：A 少了给出的、B 多了给出的，差距正好是两个「给出」）</div>
+  <div class="hint">都是「A 有 n 个，B 再补一些就和 A 一样多」的题型。点每题的「播放讲解过程」，就在这道题下面展开动画讲解（含算式），再点一次收起。</div>
+  <div class="formula">小口诀：<b>B现在 = A有 − 还差</b>（A 有这么多，B 比 A 少几个，就减几个）</div>
   <div class="qlist" id="qlist"></div>
   <div class="controls" style="text-align:left;margin-top:12px;">
     <button class="toggle-ans" onclick="toggleAnswers()">显示 / 隐藏答案</button>
@@ -147,22 +143,23 @@
 
 <script>
 // ===== 示例题 & 训练题数据 =====
-const DEMO = { a:'笑笑', b:'淘气', item:'糖果', emoji:'🍬', n:10, g:2 };
+// verb：补充动作的动词（例题用"拔"，练习题用"拿"）
+const DEMO = { a:'小花', b:'小明', item:'萝卜', emoji:'🥕', n:7, g:2, verb:'拔' };
 const problems = [
-  { a:'笑笑', b:'淘气', item:'糖果',   emoji:'🍬', n:12, g:3 },
-  { a:'小明', b:'小红', item:'鸡腿',   emoji:'🍗', n:8,  g:2 },
-  { a:'乐乐', b:'贝贝', item:'玩具车', emoji:'🚗', n:14, g:2 },
-  { a:'妞妞', b:'壮壮', item:'铅笔',   emoji:'✏️', n:9,  g:1 },
-  { a:'天天', b:'可可', item:'饼干',   emoji:'🍪', n:16, g:4 },
-  { a:'果果', b:'糖糖', item:'草莓',   emoji:'🍓', n:18, g:3 },
-  { a:'丁丁', b:'当当', item:'贴纸',   emoji:'🔖', n:20, g:5 },
-  { a:'圆圆', b:'方方', item:'气球',   emoji:'🎈', n:10, g:2 },
-  { a:'皮皮', b:'西西', item:'积木',   emoji:'🧱', n:15, g:2 },
-  { a:'毛毛', b:'朵朵', item:'小橘子', emoji:'🍊', n:13, g:1 },
+  { a:'小花', b:'小明', item:'萝卜',   emoji:'🥕', n:7,  g:2, verb:'拔' },
+  { a:'笑笑', b:'淘气', item:'糖果',   emoji:'🍬', n:9,  g:3, verb:'拿' },
+  { a:'小明', b:'小红', item:'苹果',   emoji:'🍎', n:8,  g:1, verb:'拿' },
+  { a:'乐乐', b:'贝贝', item:'积木',   emoji:'🧱', n:10, g:4, verb:'拿' },
+  { a:'妞妞', b:'壮壮', item:'草莓',   emoji:'🍓', n:6,  g:2, verb:'拿' },
+  { a:'天天', b:'可可', item:'气球',   emoji:'🎈', n:12, g:5, verb:'拿' },
+  { a:'果果', b:'糖糖', item:'铅笔',   emoji:'✏️', n:11, g:3, verb:'拿' },
+  { a:'丁丁', b:'当当', item:'饼干',   emoji:'🍪', n:5,  g:2, verb:'拿' },
+  { a:'圆圆', b:'方方', item:'橘子',   emoji:'🍊', n:9,  g:4, verb:'拿' },
+  { a:'皮皮', b:'西西', item:'小汽车', emoji:'🚗', n:13, g:6, verb:'拿' },
 ];
 
 function problemText(p){
-  return `${p.a} 有 ${p.n} 个${p.item}，给了 ${p.b} ${p.g} 个，${p.b} 和 ${p.a} 就一样多了，请问 ${p.b} 原来有几个${p.item}？`;
+  return `${p.a} 有 ${p.n} 个${p.item}，${p.b} 再${p.verb} ${p.g} 个就${p.a}一样多了，请问 ${p.b} 现在有几个${p.item}？`;
 }
 
 // ===== 语音 =====
@@ -214,62 +211,28 @@ function renderTray(el, count, given, emoji){
   }
 }
 
-// 飞物品动画
-function doGive(p, ui){
-  const g = p.g;
-  const moving = [...ui.aTray.querySelectorAll('.candy')].slice(-g);
-  const bRect = ui.bTray.getBoundingClientRect();
-  moving.forEach((c, i) => {
-    const cr = c.getBoundingClientRect();
-    const fly = document.createElement('div');
-    fly.className = 'fly';
-    fly.textContent = p.emoji || '🍬';
-    fly.style.left = cr.left + 'px';
-    fly.style.top = cr.top + 'px';
-    document.body.appendChild(fly);
-    const tx = bRect.left + 14 + i * 34;
-    const ty = bRect.top + 8;
-    requestAnimationFrame(() => {
-      fly.style.transform = `translate(${tx - cr.left}px, ${ty - cr.top}px) scale(1.15)`;
-    });
-    setTimeout(() => fly.remove(), 900);
-  });
-  setTimeout(() => {
-    renderTray(ui.aTray, p.n - g, 0, p.emoji);
-    ui.aBadge.textContent = (p.n - g) + ' 个';
-    renderTray(ui.bTray, g, g, p.emoji);
-    ui.bBadge.textContent = g + ' 个';
-  }, 880);
-}
-
 function pulse(el){
   if(el.animate) el.animate([{transform:'scale(1)'},{transform:'scale(1.06)'},{transform:'scale(1)'}],{duration:450});
 }
 
 // ===== 步骤生成（每步带算式，只用于讲解逻辑）=====
+// 新题型：A 有 n 个，B 再补 g 个就 = A，求 B 现在有几个  => B = n - g
 function buildSteps(p, ui){
-  const { a, b, item, emoji, n, g } = p;
-  const afterA = n - g;   // A 送完后剩下的
-  const ans    = n - 2*g; // B 原来有的
+  const { a, b, item, emoji, n, g, verb } = p;
+  const ans = n - g; // B 现在有的
   return [
     { text:`题目说：<b>${a} 有 ${n} 个${item}</b>。先把 ${a} 的 ${n} 个${item}摆出来。`,
       calc:'',
       run:()=>{ renderTray(ui.aTray,n,0,emoji); ui.aBadge.textContent=n+' 个'; renderTray(ui.bTray,'?',0,emoji); ui.bBadge.textContent='？'; } },
-    { text:`${a} 送给 ${b} <b>${g} 个</b>${item}，看，${g} 个飞到 ${b} 那里去了！`,
+    { text:`题目又说：${b} 再${verb} <b>${g} 个</b>，就${p.a}一样多了。这说明 ${b} 现在比 ${a} 少 <b>${g} 个</b>（蓝圈圈出的，就是 ${b} 还差的数量）。`,
       calc:'',
-      run:()=>{ doGive(p, ui); } },
-    { text:`送完以后，${a} 剩下 ${n} 减 ${g}，等于 <b>${afterA} 个</b>。`,
-      calc:`${a} 送完后剩下：\n${n} − ${g} = ${afterA}`,
-      run:()=>{ renderTray(ui.aTray,afterA,0,emoji); ui.aBadge.textContent=afterA+' 个'; renderTray(ui.bTray,g,g,emoji); ui.bBadge.textContent=g+' 个'; pulse(ui.aTray); } },
-    { text:`题目说这时 ${a} 和 ${b} <b>一样多</b>，所以 ${b} 现在也有 <b>${afterA} 个</b>。`,
-      calc:'',
-      run:()=>{ renderTray(ui.bTray,afterA,g,emoji); ui.bBadge.textContent=afterA+' 个'; pulse(ui.bTray); } },
-    { text:`可是 ${b} 的 ${afterA} 个里，<b>有 ${g} 个是 ${a} 送来的</b>（蓝圈圈住的），那不是 ${b} 自己的呀！`,
-      calc:'',
-      run:()=>{ renderTray(ui.bTray,afterA,g,emoji); ui.bBadge.textContent=afterA+' 个'; pulse(ui.bTray); } },
-    { text:`把送来的 ${g} 个还回去：${afterA} 减 ${g} 等于 <b>${ans}</b>。所以 ${b} 原来有 <b>${ans} 个</b>${item}！🎉`,
-      calc:`${b} 原来 = ${afterA} − ${g} = ${ans}`,
-      run:()=>{ renderTray(ui.bTray,ans,0,emoji); ui.bBadge.textContent='原来有 '+ans+' 个'; pulse(ui.bTray); } },
+      run:()=>{ renderTray(ui.aTray,n,g,emoji); ui.aBadge.textContent=n+' 个'; renderTray(ui.bTray,'?',0,emoji); ui.bBadge.textContent='？'; pulse(ui.aTray); } },
+    { text:`${a} 有 ${n} 个，${b} 比 ${a} 少 ${g} 个，那 ${b} 就是 ${n} 减 ${g}。`,
+      calc:`${n} − ${g} = ${ans}`,
+      run:()=>{ renderTray(ui.aTray,n,0,emoji); ui.aBadge.textContent=n+' 个'; renderTray(ui.bTray,ans,0,emoji); ui.bBadge.textContent=ans+' 个'; pulse(ui.bTray); } },
+    { text:`所以 ${b} 现在有 <b>${ans} 个</b>${item}！🎉`,
+      calc:`${b} 现在 = ${n} − ${g} = ${ans}`,
+      run:()=>{ renderTray(ui.bTray,ans,0,emoji); ui.bBadge.textContent='现在有 '+ans+' 个'; pulse(ui.bTray); } },
   ];
 }
 
@@ -392,15 +355,15 @@ function closeMini(){
 }
 
 problems.forEach((p, idx)=>{
-  const ans = p.n - 2*p.g;
+  const ans = p.n - p.g;
   const div = document.createElement('div');
   div.className = 'qitem';
   div.innerHTML =
     `<div class="qhead"><span class="qnum">${idx+1}）</span>` +
-    `<span class="qtext">${p.a} 有 <b>${p.n}</b> 个${p.item}，给 ${p.b} <b>${p.g}</b> 个后，两人一样多。${p.b} 原来有几个？</span></div>` +
+    `<span class="qtext">${p.a} 有 <b>${p.n}</b> 个${p.item}，${p.b} 再${p.verb} <b>${p.g}</b> 个就${p.a}一样多。${p.b} 现在有几个？</span></div>` +
     `<div class="qctrl">` +
       `<button class="btn-play-sm">▶ 播放讲解过程</button>` +
-      `<span class="ans" style="display:none;">答：${p.b} 原来有 <b>${ans}</b> 个。</span>` +
+      `<span class="ans" style="display:none;">答：${p.b} 现在有 <b>${ans}</b> 个。</span>` +
     `</div>`;
   const wrap = document.createElement('div');
   wrap.className = 'mini-wrap';
