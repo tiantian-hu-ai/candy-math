@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>图形代换小侦探 · 等量代换动画讲解</title>
+<title>一年级思维训练小课堂 · 等量代换 & 排队问题</title>
 <style>
   * { box-sizing:border-box; margin:0; padding:0; }
   body { font-family:"PingFang SC","Microsoft YaHei",sans-serif;
@@ -48,6 +48,19 @@
   .btn.blue { background:#3d87d6; } .btn.gray { background:#9a93ad; }
   .btn.orange { background:#e8842c; }
 
+  /* ===== 排队队列 ===== */
+  .queue-row { display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin-bottom:14px; }
+  .q-person { width:42px; height:42px; border-radius:50%; background:#fff; border:3px solid #d9d2e8;
+    display:flex; align-items:center; justify-content:center; font-size:21px; position:relative;
+    transition:background .3s, border-color .3s, transform .3s; }
+  .q-person .tag { position:absolute; bottom:-15px; font-size:11px; color:#e8543a; font-weight:bold; white-space:nowrap; }
+  .q-person.me { border-color:#e8543a; background:#fff0ec; }
+  .q-person.front { background:#e3f0ff; border-color:#3d87d6; }
+  .q-person.back { background:#fff0db; border-color:#e8842c; }
+  .q-person.overlap { box-shadow:0 0 0 3px #e8543a; animation:pop .5s cubic-bezier(.3,1.6,.5,1); }
+  .q-person.pulse { animation:beat .8s ease infinite; }
+  @keyframes beat { 0%,100%{transform:scale(1);} 50%{transform:scale(1.18);} }
+
   /* ===== 练习题 ===== */
   .p-item { border:1.5px solid #eee5d8; border-radius:12px; padding:10px 12px;
     margin-bottom:12px; background:#fffdf8; }
@@ -56,7 +69,7 @@
     color:#fff; font-size:14px; font-weight:bold; display:flex;
     align-items:center; justify-content:center; margin-top:2px; }
   .p-eqs { flex:1; font-size:17px; font-weight:bold; color:#555;
-    letter-spacing:2px; line-height:1.8; }
+    letter-spacing:1px; line-height:1.8; }
   .p-btns { display:flex; gap:8px; margin-top:8px; margin-left:36px; flex-wrap:wrap; }
   .p-ans { display:none; margin-top:8px; margin-left:36px; font-size:15px;
     font-weight:bold; color:#1e7a3c; background:#e2f6e6; border-radius:8px; padding:7px 10px; }
@@ -66,6 +79,15 @@
   .tip { font-size:13px; color:#999; text-align:center; margin-top:8px; }
   .koujue { text-align:center; font-size:15px; color:#8a5a00; background:#fff3d6;
     border-radius:10px; padding:10px; margin-top:4px; }
+
+  /* ===== tab ===== */
+  .tabs { display:flex; gap:8px; justify-content:center; margin-bottom:16px; }
+  .tab { flex:1; max-width:240px; border:none; border-radius:12px 12px 0 0;
+    padding:13px 8px; font-size:16px; font-weight:bold; cursor:pointer;
+    background:#e8e2f5; color:#6b5fa8; transition:background .2s, color .2s; }
+  .tab.active { background:#7b5fd0; color:#fff; }
+  .tabpane { display:none; }
+  .tabpane.active { display:block; }
 
   /* ===== 手机适配 ===== */
   @media (max-width:600px){
@@ -79,31 +101,68 @@
     .btn{padding:8px 12px; font-size:13px;}
     .p-eqs{font-size:15px;} .p-no{min-width:22px; height:22px; font-size:12px;}
     .p-btns,.p-ans,.p-stage{margin-left:0;} .p-ans{font-size:13px;}
+    .q-person{width:34px; height:34px; font-size:17px; border-width:2px;}
+    .q-person .tag{font-size:10px; bottom:-13px;}
+    .tab{font-size:14px; padding:11px 6px;}
   }
   @media (max-width:380px){
     .eq{font-size:14px;} .token{width:42px; height:42px; gap:8px;}
     .tokens{gap:8px;} .calc{font-size:13px;} .subtitle{font-size:13px;}
+    .q-person{width:30px; height:30px; font-size:15px;}
   }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>🔍 图形代换小侦探</h1>
-  <div class="tag">等量代换 · 一年级思维训练</div>
-  <div class="intro">图形后面藏着数字！像小侦探一样：<b>先解开一个，再把它带到别的算式里</b>，图形就全部现形啦～</div>
+  <h1>🧮 一年级思维训练小课堂</h1>
+  <div class="tag">等量代换 &amp; 排队问题 · 动画讲解</div>
 
-  <section class="card">
-    <h2>📘 例题讲解</h2>
-    <div class="problem-text">下面算式中的图形各表示几？<br>□ + □ = 12，&nbsp;&nbsp;△ + □ = 17，&nbsp;&nbsp;△ − ☆ − ☆ = 3</div>
-    <div id="exStage"></div>
-  </section>
+  <div class="tabs">
+    <button class="tab active" data-tab="sub">📐 等量代换</button>
+    <button class="tab" data-tab="queue">🚶 排队问题</button>
+  </div>
 
-  <section class="card">
-    <h2>✏️ 练一练（10 题）</h2>
-    <div class="tip">点「播放讲解过程」，在这道题下面看动画讲解；随时可点「显示答案」核对</div>
-    <div id="practice"></div>
-    <div class="koujue">🗣 小口诀：<b>先解「两个一样的」，再把它代进别的算式！</b></div>
-  </section>
+  <!-- ============ 等量代换 ============ -->
+  <div class="tabpane active" id="pane-sub">
+    <div class="intro">图形后面藏着数字！像小侦探一样：<b>先解开一个，再把它带到别的算式里</b>，图形就全部现形啦～</div>
+
+    <section class="card">
+      <h2>📘 例题讲解</h2>
+      <div class="problem-text">下面算式中的图形各表示几？<br>□ + □ = 12，&nbsp;&nbsp;△ + □ = 17，&nbsp;&nbsp;△ − ☆ − ☆ = 3</div>
+      <div id="exStage"></div>
+    </section>
+
+    <section class="card">
+      <h2>✏️ 练一练（10 题）</h2>
+      <div class="tip">点「播放讲解过程」，在这道题下面看动画讲解；随时可点「显示答案」核对</div>
+      <div id="practice"></div>
+      <div class="koujue">🗣 小口诀：<b>先解「两个一样的」，再把它代进别的算式！</b></div>
+    </section>
+  </div>
+
+  <!-- ============ 排队问题 ============ -->
+  <div class="tabpane" id="pane-queue">
+    <div class="intro">排队也能算出来！记住两句话：<b>两头数要减 1（自己被数了两次）；一头数要加 1（别忘把自己算上）</b>。</div>
+
+    <section class="card">
+      <h2>📘 例题讲解①：两头数（第几 + 第几）</h2>
+      <div class="problem-text">小明从前往后数排第 3，从后往前数排第 2。这一队一共有几人？</div>
+      <div id="qEx1"></div>
+    </section>
+
+    <section class="card">
+      <h2>📘 例题讲解②：一头数（前面 + 后面）</h2>
+      <div class="problem-text">小红前面有 3 人，后面有 2 人。这一队一共有几人？</div>
+      <div id="qEx2"></div>
+    </section>
+
+    <section class="card">
+      <h2>✏️ 练一练（10 题）</h2>
+      <div class="tip">点「播放讲解过程」，在这道题下面看动画讲解；随时可点「显示答案」核对</div>
+      <div id="queuePractice"></div>
+      <div class="koujue">🗣 小口诀：<b>两头数：第几 + 第几 − 1（自己数两次）；一头数：前面 + 后面 + 1（别忘自己）！</b></div>
+    </section>
+  </div>
 </div>
 
 <script>
@@ -119,7 +178,21 @@ function speak(text){
   }catch(e){}
 }
 
-/* ================= 题目数据 ================= */
+/* ================= tab 切换 ================= */
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.tabpane').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('pane-'+tab.dataset.tab).classList.add('active');
+    if('speechSynthesis' in window) try{ speechSynthesis.cancel(); }catch(e){}
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+});
+
+/* ======================================================
+   板块一：等量代换
+   ====================================================== */
 const SHAPES = {'□':'#2f7fd1','△':'#e8842c','☆':'#8e5bd1','○':'#2fa35a'};
 
 const EXAMPLE = {
@@ -171,7 +244,6 @@ const PRACTICE = [
     {type:'addSub',    eq:2, sym:'□', T:11, k:'☆'}]},
 ];
 
-/* ================= 生成讲解步骤 ================= */
 function buildSteps(p){
   const known = {};
   const steps = [];
@@ -227,7 +299,6 @@ function buildSteps(p){
   return {steps, known};
 }
 
-/* ================= 播放器组件 ================= */
 function makePlayer(mount, p){
   const {steps, known} = buildSteps(p);
   mount.innerHTML = `
@@ -303,7 +374,6 @@ function makePlayer(mount, p){
   return {steps, known};
 }
 
-/* ================= 渲染页面 ================= */
 makePlayer(document.getElementById('exStage'), EXAMPLE);
 
 const prWrap = document.getElementById('practice');
@@ -341,6 +411,206 @@ PRACTICE.forEach((p,i)=>{
     }
     openStage = stage;
     if(!player) player = makePlayer(stage, p);
+    stage.classList.add('show');
+    playBtn.textContent='■ 收起讲解';
+    stage.scrollIntoView({behavior:'smooth', block:'nearest'});
+  });
+  ansBtn.addEventListener('click', function(){
+    const a = item.querySelector('.p-ans');
+    a.classList.toggle('show');
+    this.textContent = a.classList.contains('show') ? '隐藏答案' : '显示答案';
+  });
+});
+
+/* ======================================================
+   板块二：排队问题
+   ====================================================== */
+const QUEUE_EX1 = {type:'A', name:'小明', f:3, b:2};   // 3+2-1=4
+const QUEUE_EX2 = {type:'B', name:'小红', F:3, B:2};   // 3+2+1=6
+
+const QUEUE_PRACTICE = [
+  {type:'A', name:'小明', f:4, b:3},   // 6
+  {type:'A', name:'小华', f:3, b:4},   // 6
+  {type:'A', name:'小刚', f:5, b:2},   // 6
+  {type:'A', name:'小美', f:4, b:4},   // 7
+  {type:'A', name:'小强', f:2, b:6},   // 7
+  {type:'B', name:'小红', F:4, B:3},   // 8
+  {type:'B', name:'小丽', F:3, B:4},   // 8
+  {type:'B', name:'小军', F:5, B:2},   // 8
+  {type:'B', name:'小燕', F:4, B:4},   // 9
+  {type:'B', name:'小东', F:3, B:5},   // 9
+];
+
+function buildQueueSteps(q){
+  const steps = [];
+  let total, mePos;
+  if(q.type==='A'){
+    const f=q.f, b=q.b; total = f + b - 1; mePos = f;
+    steps.push({highlight:'none',
+      sub:`题目：${q.name}从前往后数排第 ${f}，从后往前数排第 ${b}。这一队一共有几人？`,
+      calc:'问题：这一队一共几人？',
+      say:`${q.name}从前往后数排第${f}，从后往前数排第${b}。这一队一共有几人？`});
+    steps.push({highlight:'front',
+      sub:`从前往后数，数到${q.name}一共有 ${f} 个人（${q.name}算在内）`,
+      calc:`前面这一组：${f} 人（含${q.name}）`,
+      say:`从前往后数，数到${q.name}一共有${f}个人，${q.name}要算在里面。`});
+    steps.push({highlight:'back',
+      sub:`从后往前数，数到${q.name}一共有 ${b} 个人（${q.name}也算在内）`,
+      calc:`后面这一组：${b} 人（含${q.name}）`,
+      say:`从后往前数，数到${q.name}一共有${b}个人，${q.name}也要算在里面。`});
+    steps.push({highlight:'overlap',
+      sub:`注意！${q.name}在前面的组和后面的组里各被数了一次，一共被数了 2 次，多算了 1 个${q.name}。`,
+      calc:`两组相加会多数 1 个${q.name}，所以要 −1`,
+      say:`注意！${q.name}被数了两次，多算了一个${q.name}，所以要减去1。`});
+    steps.push({highlight:'none',
+      sub:`把两组加起来，再减去多数的一次：${f} + ${b} − 1 = ${total}`,
+      calc:`${f} + ${b} − 1 = ${total}\n一共 ${total} 人！`,
+      say:`${f}加${b}减1等于${total}，一共${total}人！`});
+  } else {
+    const F=q.F, B=q.B; total = F + B + 1; mePos = F + 1;
+    steps.push({highlight:'none',
+      sub:`题目：${q.name}前面有 ${F} 人，后面有 ${B} 人。这一队一共有几人？`,
+      calc:'问题：这一队一共几人？',
+      say:`${q.name}前面有${F}人，后面有${B}人。这一队一共有几人？`});
+    steps.push({highlight:'front',
+      sub:`${q.name}前面有 ${F} 人（不含${q.name}自己）`,
+      calc:`前面：${F} 人`,
+      say:`${q.name}前面有${F}个人。`});
+    steps.push({highlight:'back',
+      sub:`${q.name}后面有 ${B} 人（不含${q.name}自己）`,
+      calc:`后面：${B} 人`,
+      say:`${q.name}后面有${B}个人。`});
+    steps.push({highlight:'me',
+      sub:`别忘了！还要把${q.name}自己也算进去～`,
+      calc:`还要 +1（${q.name}自己）`,
+      say:`别忘了，还要把${q.name}自己也算进去！`});
+    steps.push({highlight:'none',
+      sub:`把前面、后面和自己加起来：${F} + ${B} + 1 = ${total}`,
+      calc:`${F} + ${B} + 1 = ${total}\n一共 ${total} 人！`,
+      say:`${F}加${B}加1等于${total}，一共${total}人！`});
+  }
+  steps.push({highlight:'none',
+    sub:`答案：这一队一共有 ${total} 人！`,
+    calc:`一共 ${total} 人`,
+    say:`答案，这一队一共有${total}人！`});
+  return {steps, total, mePos, type:q.type, q};
+}
+
+function makeQueuePlayer(mount, q){
+  const {steps, total, mePos, type} = buildQueueSteps(q);
+  let rowHtml = '<div class="queue-row">';
+  for(let i=1;i<=total;i++){
+    const isMe = (i===mePos);
+    rowHtml += `<div class="q-person${isMe?' me':''}" data-pos="${i}">`
+      + `<span class="face">${isMe?'😀':'🧒'}</span>`
+      + (isMe?`<span class="tag">${q.name}</span>`:'')
+      + `</div>`;
+  }
+  rowHtml += '</div>';
+  mount.innerHTML = `
+    <div class="stage">
+      ${rowHtml}
+      <div class="subtitle"></div>
+      <div class="calc"></div>
+      <div class="ctrl">
+        <button class="btn play">▶ 播放讲解（带语音）</button>
+        <button class="btn blue next">下一步</button>
+        <button class="btn gray reset">↺ 重来</button>
+        <button class="btn orange snd">🔊 声音开</button>
+      </div>
+    </div>`;
+  const q2 = sel => mount.querySelector(sel);
+  const persons = mount.querySelectorAll('.q-person');
+  let idx = -1, timer = null, playing = false;
+
+  function clearHi(){ persons.forEach(el=>el.classList.remove('front','back','overlap','pulse')); }
+  function applyHi(kind){
+    clearHi();
+    if(kind==='front' || kind==='overlap'){
+      const n = (type==='A') ? q.f : q.F;
+      for(let i=1;i<=n;i++) persons[i-1].classList.add('front');
+    }
+    if(kind==='back' || kind==='overlap'){
+      const n = (type==='A') ? q.b : q.B;
+      for(let j=0;j<n;j++) persons[total-1-j].classList.add('back');
+    }
+    if(kind==='overlap') persons[mePos-1].classList.add('overlap');
+    if(kind==='me') persons[mePos-1].classList.add('pulse');
+  }
+  function show(i){
+    if(i<0){ q2('.subtitle').textContent='点「播放讲解」或「下一步」，跟着动画一起数人数～';
+      q2('.calc').textContent=''; clearHi(); return; }
+    const st = steps[i];
+    applyHi(st.highlight);
+    q2('.subtitle').textContent = st.sub;
+    q2('.calc').textContent = st.calc;
+    speak(st.say);
+  }
+  function next(){ if(idx>=steps.length-1) return; idx++; show(idx); }
+  function reset(){ stopPlay(); idx=-1; clearHi(); show(-1); }
+  function stopPlay(){
+    if(timer){ clearInterval(timer); timer=null; }
+    if(playing){ playing=false; q2('.play').textContent='▶ 播放讲解（带语音）'; }
+    if('speechSynthesis' in window) try{speechSynthesis.cancel();}catch(e){}
+  }
+  function play(){
+    if(playing){ stopPlay(); return; }
+    if(idx>=steps.length-1) reset();
+    playing=true; q2('.play').textContent='⏸ 暂停';
+    next();
+    timer=setInterval(()=>{ if(idx>=steps.length-1){ stopPlay(); } else next(); }, 4200);
+  }
+  q2('.play').addEventListener('click', play);
+  q2('.next').addEventListener('click', ()=>{ stopPlay(); next(); });
+  q2('.reset').addEventListener('click', reset);
+  q2('.snd').addEventListener('click', function(){
+    soundOn = !soundOn;
+    this.textContent = soundOn ? '🔊 声音开' : '🔇 声音关';
+    if(!soundOn && 'speechSynthesis' in window) try{speechSynthesis.cancel();}catch(e){}
+  });
+  show(-1);
+}
+
+makeQueuePlayer(document.getElementById('qEx1'), QUEUE_EX1);
+makeQueuePlayer(document.getElementById('qEx2'), QUEUE_EX2);
+
+const qPrWrap = document.getElementById('queuePractice');
+let openQStage = null;
+QUEUE_PRACTICE.forEach((q,i)=>{
+  const {total} = buildQueueSteps(q);
+  const text = (q.type==='A')
+    ? `${q.name}从前往后数排第 ${q.f}，从后往前数排第 ${q.b}。这一队一共有几人？`
+    : `${q.name}前面有 ${q.F} 人，后面有 ${q.B} 人。这一队一共有几人？`;
+  const item = document.createElement('div');
+  item.className = 'p-item';
+  item.innerHTML = `
+    <div class="p-head">
+      <span class="p-no">${i+1}</span>
+      <div class="p-eqs">${text}</div>
+    </div>
+    <div class="p-btns">
+      <button class="btn playBtn">▶ 播放讲解过程</button>
+      <button class="btn blue ansBtn">显示答案</button>
+    </div>
+    <div class="p-ans">一共有 ${total} 人</div>
+    <div class="p-stage"></div>`;
+  qPrWrap.appendChild(item);
+  const stage = item.querySelector('.p-stage');
+  const playBtn = item.querySelector('.playBtn');
+  const ansBtn = item.querySelector('.ansBtn');
+  let player = null;
+  playBtn.addEventListener('click', ()=>{
+    if(stage.classList.contains('show')){
+      stage.classList.remove('show'); playBtn.textContent='▶ 播放讲解过程';
+      if('speechSynthesis' in window) try{speechSynthesis.cancel();}catch(e){}
+      return;
+    }
+    if(openQStage && openQStage!==stage){
+      openQStage.classList.remove('show');
+      openQStage.parentNode.querySelector('.playBtn').textContent='▶ 播放讲解过程';
+    }
+    openQStage = stage;
+    if(!player) player = makeQueuePlayer(stage, q);
     stage.classList.add('show');
     playBtn.textContent='■ 收起讲解';
     stage.scrollIntoView({behavior:'smooth', block:'nearest'});
