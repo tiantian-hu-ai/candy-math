@@ -133,40 +133,42 @@ const EXAMPLE = {
 };
 
 const PRACTICE = [
-  {vars:['□','☆'], eqs:['☆ − □ = 8','5 + □ = 9'], solve:[
+  {vars:['☆','□'], eqs:['☆ − □ = 8','5 + □ = 9'], solve:[
     {type:'addSub',   eq:1, sym:'□', T:9, k:5},
     {type:'symMinus', eq:0, sym:'☆', k:'□', d:8}]},
-  {vars:['○','△'], eqs:['○ + ○ = 8','△ + ○ = 10'], solve:[
-    {type:'double', eq:0, sym:'○', S:8},
-    {type:'addSub', eq:1, sym:'△', T:10, k:'○'}]},
-  {vars:['□','△'], eqs:['□ + □ = 10','□ + △ = 9'], solve:[
-    {type:'double', eq:0, sym:'□', S:10},
-    {type:'addSub', eq:1, sym:'△', T:9, k:'□'}]},
-  {vars:['☆','○'], eqs:['☆ + ☆ = 14','☆ + ○ = 12'], solve:[
-    {type:'double', eq:0, sym:'☆', S:14},
-    {type:'addSub', eq:1, sym:'○', T:12, k:'☆'}]},
-  {vars:['△','□'], eqs:['△ + △ = 6','△ + □ = 11'], solve:[
-    {type:'double', eq:0, sym:'△', S:6},
-    {type:'addSub', eq:1, sym:'□', T:11, k:'△'}]},
-  {vars:['○','□'], eqs:['○ + ○ + ○ = 9','○ + □ = 7'], solve:[
-    {type:'triple', eq:0, sym:'○', S:9},
-    {type:'addSub', eq:1, sym:'□', T:7, k:'○'}]},
-  {vars:['□','△','☆'], eqs:['□ + □ = 12','△ + □ = 15','△ − ☆ = 2'], solve:[
-    {type:'double',  eq:0, sym:'□', S:12},
-    {type:'addSub',  eq:1, sym:'△', T:15, k:'□'},
-    {type:'subKnown',eq:2, sym:'☆', k:'△', d:2}]},
-  {vars:['○','△','☆'], eqs:['○ + ○ = 16','○ + △ = 11','△ + ☆ = 12'], solve:[
-    {type:'double', eq:0, sym:'○', S:16},
-    {type:'addSub', eq:1, sym:'△', T:11, k:'○'},
-    {type:'addSub', eq:2, sym:'☆', T:12, k:'△'}]},
-  {vars:['☆','□','○'], eqs:['☆ + ☆ = 18','□ + ☆ = 13','□ − ○ = 2'], solve:[
-    {type:'double',  eq:0, sym:'☆', S:18},
-    {type:'addSub',  eq:1, sym:'□', T:13, k:'☆'},
-    {type:'subKnown',eq:2, sym:'○', k:'□', d:2}]},
-  {vars:['△','○','□'], eqs:['△ + △ = 4','△ + ○ = 12','○ + □ = 15'], solve:[
-    {type:'double', eq:0, sym:'△', S:4},
-    {type:'addSub', eq:1, sym:'○', T:12, k:'△'},
-    {type:'addSub', eq:2, sym:'□', T:15, k:'○'}]},
+  {vars:['△','□'], eqs:['△ + △ = 12','□ − △ = 9'], solve:[
+    {type:'double',   eq:0, sym:'△', S:12},
+    {type:'symMinus', eq:1, sym:'□', k:'△', d:9}]},
+  {vars:['○','☆'], eqs:['○ + ○ = 10','☆ − ○ = 7'], solve:[
+    {type:'double',   eq:0, sym:'○', S:10},
+    {type:'symMinus', eq:1, sym:'☆', k:'○', d:7}]},
+  {vars:['□','△','☆'], eqs:['□ + □ = 14','△ + □ = 16','△ − ☆ = 3'], solve:[
+    {type:'double',   eq:0, sym:'□', S:14},
+    {type:'addSub',   eq:1, sym:'△', T:16, k:'□'},
+    {type:'subKnown', eq:2, sym:'☆', k:'△', d:3}]},
+  {vars:['○','△','☆'], eqs:['○ + ○ = 12','○ + △ = 15','△ + ☆ = 13'], solve:[
+    {type:'double',   eq:0, sym:'○', S:12},
+    {type:'addSub',   eq:1, sym:'△', T:15, k:'○'},
+    {type:'addSub',   eq:2, sym:'☆', T:13, k:'△'}]},
+  {vars:['△','☆'], eqs:['△ + △ = 16','△ − ☆ − ☆ = 4'], solve:[
+    {type:'double',    eq:0, sym:'△', S:16},
+    {type:'doubleDiff',eq:1, totalSym:'△', sym:'☆', R:4}]},
+  {vars:['□','○','△'], eqs:['□ + □ = 12','□ − ○ − ○ = 2','○ + △ = 9'], solve:[
+    {type:'double',    eq:0, sym:'□', S:12},
+    {type:'doubleDiff',eq:1, totalSym:'□', sym:'○', R:2},
+    {type:'addSub',    eq:2, sym:'△', T:9, k:'○'}]},
+  {vars:['☆','□','○'], eqs:['☆ + ☆ = 18','☆ + □ = 13','□ − ○ = 3'], solve:[
+    {type:'double',   eq:0, sym:'☆', S:18},
+    {type:'addSub',   eq:1, sym:'□', T:13, k:'☆'},
+    {type:'subKnown', eq:2, sym:'○', k:'□', d:3}]},
+  {vars:['○','△','□'], eqs:['○ + ○ + ○ = 15','○ + △ = 12','△ + □ = 14'], solve:[
+    {type:'triple',   eq:0, sym:'○', S:15},
+    {type:'addSub',   eq:1, sym:'△', T:12, k:'○'},
+    {type:'addSub',   eq:2, sym:'□', T:14, k:'△'}]},
+  {vars:['△','☆','□'], eqs:['△ + △ = 8','△ − ☆ − ☆ = 0','☆ + □ = 11'], solve:[
+    {type:'double',    eq:0, sym:'△', S:8},
+    {type:'doubleDiff',eq:1, totalSym:'△', sym:'☆', R:0},
+    {type:'addSub',    eq:2, sym:'□', T:11, k:'☆'}]},
 ];
 
 /* ================= 生成讲解步骤 ================= */
