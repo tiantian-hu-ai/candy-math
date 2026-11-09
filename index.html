@@ -2,392 +2,353 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>还差几个就一样多 · 题型动画讲解</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>图形代换小侦探 · 等量代换动画讲解</title>
 <style>
-  * { box-sizing: border-box; }
-  body {
-    margin: 0; font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: linear-gradient(160deg,#fff7e6,#ffe9f0); color:#444; padding: 18px;
-  }
-  h1 { text-align:center; font-size:24px; color:#e8732a; margin:6px 0 2px; }
-  .lead { text-align:center; color:#888; font-size:14px; margin-bottom:14px; }
-  .stage {
-    max-width: 760px; margin: 0 auto; background:#fff; border-radius:18px;
-    box-shadow:0 6px 20px rgba(0,0,0,.08); padding:18px;
-  }
-  /* 题目卡：先展示题目 */
-  .problem-card {
-    background:#fff4d6; border:2px solid #ffcf6b; border-radius:14px;
-    padding:14px 16px; font-size:18px; line-height:1.5; color:#7a4a12;
-    margin-bottom:14px; font-weight:bold;
-  }
-  .problem-card .tag {
-    display:inline-block; background:#ff8a3d; color:#fff; font-size:13px;
-    border-radius:8px; padding:2px 8px; margin-right:8px; vertical-align:middle;
-  }
-  .persons { display:flex; gap:14px; justify-content:space-around; }
-  .person { flex:1; text-align:center; }
-  .avatar { font-size:46px; }
-  .pname { font-size:16px; font-weight:bold; color:#555; }
-  .badge {
-    display:inline-block; margin-top:4px; min-width:64px; padding:4px 10px;
-    background:#fff3d6; border:2px solid #ffcf6b; border-radius:14px;
-    font-size:16px; color:#b9720d; font-weight:bold;
-  }
-  .tray {
-    margin-top:10px; min-height:64px; background:#fafafa; border:2px dashed #e3d4b8;
-    border-radius:14px; padding:8px; display:flex; flex-wrap:wrap; gap:6px;
-    justify-content:center; align-content:center;
-  }
-  .candy {
-    width:30px; height:30px; border-radius:50%;
-    display:inline-flex; align-items:center; justify-content:center;
-    font-size:26px; line-height:1;
-  }
-  .candy.given { outline:3px solid #4a90d9; outline-offset:2px; border-radius:50%; }
-  .question-mark { font-size:34px; color:#bbb; font-weight:bold; }
-  .controls { text-align:center; margin-top:14px; }
-  button {
-    font-size:15px; border:none; border-radius:20px; padding:9px 18px; margin:4px;
-    cursor:pointer; font-weight:bold;
-  }
-  .btn-play { background:#ff8a3d; color:#fff; }
-  .btn-step { background:#ffe2cd; color:#c25b12; }
-  .btn-reset { background:#eee; color:#666; }
-  .subtitle {
-    margin-top:14px; background:#fffbe9; border-left:5px solid #ffcf6b;
-    border-radius:10px; padding:12px 16px; font-size:17px; line-height:1.6; min-height:54px;
-  }
-  .subtitle b { color:#e8732a; }
-  /* 算式板：把每一步的计算写出来 */
-  .calc-board {
-    margin-top:10px; background:#eef6ff; border:2px solid #bcd9ff;
-    border-radius:10px; padding:12px 16px; min-height:46px;
-    font-size:20px; color:#1f5fb0; font-weight:bold; white-space:pre-line; line-height:1.5;
-  }
-  .calc-board .clabel { font-size:13px; color:#7aa3d8; font-weight:bold; display:block; margin-bottom:4px; }
-  .practice { max-width:760px; margin:22px auto 0; background:#fff; border-radius:18px;
-    box-shadow:0 6px 20px rgba(0,0,0,.08); padding:18px; }
-  .practice h2 { color:#2c5f9e; font-size:19px; margin:0 0 6px; }
-  .practice .hint { color:#888; font-size:13px; margin-bottom:10px; }
-  .qlist { counter-reset:q; }
-  .qitem { font-size:16px; padding:10px 0; border-bottom:1px dashed #eee; }
-  .qhead { display:flex; gap:6px; align-items:baseline; }
-  .qnum { font-weight:bold; color:#e8732a; flex:none; }
-  .qtext { line-height:1.5; }
-  .qctrl { margin-top:6px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
-  .btn-play-sm { background:#ff8a3d; color:#fff; font-size:14px; padding:6px 14px; border-radius:16px; }
-  .ans { color:#1a9e5a; font-weight:bold; }
-  .toggle-ans { background:#eaf3fc; color:#2c5f9e; }
-  .formula { background:#f0f7ff; border-radius:10px; padding:10px 14px; font-size:15px;
-    color:#2c5f9e; margin:8px 0 14px; }
-  /* 练习题下方的迷你动画舞台 */
-  .mini-wrap {
-    display:none; margin-top:12px; background:#fffdf2;
-    border:2px solid #ffe2a8; border-radius:14px; padding:14px;
-  }
-  .tip { font-size:13px; color:#999; text-align:center; margin-top:8px; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"PingFang SC","Microsoft YaHei",sans-serif;
+    background:#faf7f2; color:#3a3a3a; padding:18px 12px 60px; }
+  .wrap { max-width:760px; margin:0 auto; }
+  h1 { text-align:center; font-size:26px; color:#4a3b8c; margin-bottom:6px; }
+  .tag { text-align:center; font-size:14px; color:#8a7fb0; margin-bottom:14px; }
+  .intro { background:#fff; border:2px dashed #c9bfe8; border-radius:14px;
+    padding:10px 14px; font-size:15px; color:#6b5fa8; text-align:center; margin-bottom:16px; }
+  .card { background:#fff; border-radius:16px; padding:16px 14px;
+    box-shadow:0 2px 10px rgba(90,70,160,.10); margin-bottom:18px; }
+  .card h2 { font-size:19px; color:#4a3b8c; margin-bottom:10px; }
+  .problem-text { font-size:16px; color:#444; background:#f6f3ff;
+    border-radius:10px; padding:10px 12px; margin-bottom:12px; line-height:1.7; }
 
-  /* ===== 手机端适配 ===== */
-  @media (max-width: 600px) {
-    body { padding: 10px; }
-    h1 { font-size: 20px; margin: 4px 0 2px; }
-    .lead { font-size: 13px; margin-bottom: 10px; }
-    .stage, .practice { padding: 12px; border-radius: 14px; }
-    .problem-card { font-size: 16px; padding: 10px 12px; margin-bottom: 10px; border-radius: 12px; }
-    .problem-card .tag { font-size: 12px; padding: 1px 6px; margin-right: 6px; }
-    .persons { gap: 8px; }
-    .avatar { font-size: 38px; }
-    .pname { font-size: 14px; }
-    .badge { font-size: 14px; padding: 3px 8px; min-width: 0; }
-    .tray { min-height: 52px; padding: 6px; gap: 4px; margin-top: 8px; }
-    .candy { width: 26px; height: 26px; font-size: 22px; }
-    .controls { margin-top: 10px; }
-    button { padding: 8px 13px; font-size: 14px; margin: 3px; border-radius: 18px; }
-    .btn-play-sm { padding: 6px 12px; font-size: 13px; }
-    .subtitle { margin-top: 10px; padding: 10px 12px; font-size: 15px; min-height: 48px; border-radius: 9px; }
-    .calc-board { margin-top: 8px; padding: 10px 12px; font-size: 17px; border-radius: 9px; }
-    .calc-board .clabel { font-size: 12px; }
-    .practice h2 { font-size: 17px; }
-    .practice .hint, .formula { font-size: 14px; padding: 8px 12px; }
-    .qitem { font-size: 15px; padding: 8px 0; }
-    .qtext { font-size: 15px; }
+  /* ===== 舞台 ===== */
+  .stage { border:2px solid #e3dcf5; border-radius:14px; padding:12px; background:#fcfbff; }
+  .eqs { display:flex; flex-direction:column; gap:6px; margin-bottom:12px; }
+  .eq { font-size:20px; font-weight:bold; color:#555; background:#f1eefb;
+    border-radius:8px; padding:7px 10px; letter-spacing:2px;
+    transition:background .3s, color .3s, transform .3s; }
+  .eq.hl { background:#ffe9a8; color:#8a5a00; transform:scale(1.03); }
+  .eq.done { background:#e2f6e6; color:#1e7a3c; }
+  .tokens { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:12px; }
+  .token { width:62px; height:62px; border-radius:50%; background:#fff;
+    border:3px solid #ccc; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; transition:transform .3s; }
+  .token .sym { font-size:20px; font-weight:bold; color:#888; line-height:1; }
+  .token .val { font-size:19px; font-weight:bold; color:#bbb; line-height:1; margin-top:3px; }
+  .token.solved { transform:scale(1.12); }
+  .token.solved .val { color:inherit; animation:pop .5s cubic-bezier(.3,1.6,.5,1); }
+  @keyframes pop { 0%{transform:scale(0);} 100%{transform:scale(1);} }
+  .subtitle { font-size:16px; color:#333; min-height:44px; line-height:1.6;
+    background:#fff8e6; border-radius:10px; padding:8px 10px; margin-bottom:8px; }
+  .calc { font-size:17px; font-weight:bold; color:#1e5fa8; background:#e8f1fd;
+    border-radius:10px; padding:8px 10px; min-height:40px; line-height:1.7;
+    white-space:pre-line; margin-bottom:10px; }
+  .ctrl { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+  .btn { border:none; border-radius:10px; padding:9px 16px; font-size:15px;
+    font-weight:bold; cursor:pointer; color:#fff; background:#7b5fd0; }
+  .btn:active { transform:scale(.96); }
+  .btn.blue { background:#3d87d6; } .btn.gray { background:#9a93ad; }
+  .btn.orange { background:#e8842c; }
+
+  /* ===== 练习题 ===== */
+  .p-item { border:1.5px solid #eee5d8; border-radius:12px; padding:10px 12px;
+    margin-bottom:12px; background:#fffdf8; }
+  .p-head { display:flex; align-items:flex-start; gap:10px; }
+  .p-no { min-width:26px; height:26px; border-radius:50%; background:#f0a63a;
+    color:#fff; font-size:14px; font-weight:bold; display:flex;
+    align-items:center; justify-content:center; margin-top:2px; }
+  .p-eqs { flex:1; font-size:17px; font-weight:bold; color:#555;
+    letter-spacing:2px; line-height:1.8; }
+  .p-btns { display:flex; gap:8px; margin-top:8px; margin-left:36px; flex-wrap:wrap; }
+  .p-ans { display:none; margin-top:8px; margin-left:36px; font-size:15px;
+    font-weight:bold; color:#1e7a3c; background:#e2f6e6; border-radius:8px; padding:7px 10px; }
+  .p-ans.show { display:block; }
+  .p-stage { display:none; margin-top:10px; }
+  .p-stage.show { display:block; }
+  .tip { font-size:13px; color:#999; text-align:center; margin-top:8px; }
+  .koujue { text-align:center; font-size:15px; color:#8a5a00; background:#fff3d6;
+    border-radius:10px; padding:10px; margin-top:4px; }
+
+  /* ===== 手机适配 ===== */
+  @media (max-width:600px){
+    body{padding:12px 8px 50px;}
+    h1{font-size:21px;} .tag{font-size:12px;} .intro{font-size:13px;}
+    .card{padding:12px 10px;} .card h2{font-size:16px;}
+    .problem-text{font-size:14px; padding:8px 10px;}
+    .eq{font-size:16px; padding:6px 8px; letter-spacing:1px;}
+    .token{width:50px; height:50px;} .token .sym{font-size:16px;} .token .val{font-size:15px;}
+    .subtitle{font-size:14px; min-height:38px;} .calc{font-size:14px;}
+    .btn{padding:8px 12px; font-size:13px;}
+    .p-eqs{font-size:15px;} .p-no{min-width:22px; height:22px; font-size:12px;}
+    .p-btns,.p-ans,.p-stage{margin-left:0;} .p-ans{font-size:13px;}
   }
-  @media (max-width: 380px) {
-    .badge { font-size: 13px; padding: 2px 6px; }
-    .candy { width: 24px; height: 24px; font-size: 20px; }
-    .calc-board { font-size: 16px; }
-    .subtitle { font-size: 14px; }
-    button { padding: 7px 11px; font-size: 13px; }
+  @media (max-width:380px){
+    .eq{font-size:14px;} .token{width:42px; height:42px; gap:8px;}
+    .tokens{gap:8px;} .calc{font-size:13px;} .subtitle{font-size:13px;}
   }
 </style>
 </head>
 <body>
+<div class="wrap">
+  <h1>🔍 图形代换小侦探</h1>
+  <div class="tag">等量代换 · 一年级思维训练</div>
+  <div class="intro">图形后面藏着数字！像小侦探一样：<b>先解开一个，再把它带到别的算式里</b>，图形就全部现形啦～</div>
 
-<h1>📐 还差几个就一样多</h1>
-<div class="lead">题型：A 比 B 多，B 再补一些就和 A 一样多，求 B 现在有几个</div>
+  <section class="card">
+    <h2>📘 例题讲解</h2>
+    <div class="problem-text">下面算式中的图形各表示几？<br>□ + □ = 12，&nbsp;&nbsp;△ + □ = 17，&nbsp;&nbsp;△ − ☆ − ☆ = 3</div>
+    <div id="exStage"></div>
+  </section>
 
-<!-- 顶部示例讲解舞台（由组件生成） -->
-<div class="stage" id="stageRoot"></div>
-
-<div class="practice">
-  <h2>📝 同类训练题（10 道，各种生活场景）</h2>
-  <div class="hint">都是「A 有 n 个，B 再补一些就和 A 一样多」的题型。点每题的「播放讲解过程」，就在这道题下面展开动画讲解（含算式），再点一次收起。</div>
-  <div class="formula">小口诀：<b>B现在 = A有 − 还差</b>（A 有这么多，B 比 A 少几个，就减几个）</div>
-  <div class="qlist" id="qlist"></div>
-  <div class="controls" style="text-align:left;margin-top:12px;">
-    <button class="toggle-ans" onclick="toggleAnswers()">显示 / 隐藏答案</button>
-  </div>
+  <section class="card">
+    <h2>✏️ 练一练（10 题）</h2>
+    <div class="tip">点「播放讲解过程」，在这道题下面看动画讲解；随时可点「显示答案」核对</div>
+    <div id="practice"></div>
+    <div class="koujue">🗣 小口诀：<b>先解「两个一样的」，再把它代进别的算式！</b></div>
+  </section>
 </div>
 
 <script>
-// ===== 示例题 & 训练题数据 =====
-// verb：补充动作的动词（例题用"拔"，练习题用"拿"）
-const DEMO = { a:'小花', b:'小明', item:'萝卜', emoji:'🥕', n:7, g:2, verb:'拔' };
-const problems = [
-  { a:'小花', b:'小明', item:'萝卜',   emoji:'🥕', n:7,  g:2, verb:'拔' },
-  { a:'笑笑', b:'淘气', item:'糖果',   emoji:'🍬', n:9,  g:3, verb:'拿' },
-  { a:'小明', b:'小红', item:'苹果',   emoji:'🍎', n:8,  g:1, verb:'拿' },
-  { a:'乐乐', b:'贝贝', item:'积木',   emoji:'🧱', n:10, g:4, verb:'拿' },
-  { a:'妞妞', b:'壮壮', item:'草莓',   emoji:'🍓', n:6,  g:2, verb:'拿' },
-  { a:'天天', b:'可可', item:'气球',   emoji:'🎈', n:12, g:5, verb:'拿' },
-  { a:'果果', b:'糖糖', item:'铅笔',   emoji:'✏️', n:11, g:3, verb:'拿' },
-  { a:'丁丁', b:'当当', item:'饼干',   emoji:'🍪', n:5,  g:2, verb:'拿' },
-  { a:'圆圆', b:'方方', item:'橘子',   emoji:'🍊', n:9,  g:4, verb:'拿' },
-  { a:'皮皮', b:'西西', item:'小汽车', emoji:'🚗', n:13, g:6, verb:'拿' },
+/* ================= 语音 ================= */
+let soundOn = true;
+function speak(text){
+  if(!soundOn || !('speechSynthesis' in window)) return;
+  try{
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text.replace(/□/g,'方块').replace(/△/g,'三角').replace(/☆/g,'星星').replace(/○/g,'圆圈'));
+    u.lang = 'zh-CN'; u.pitch = 1.05; u.rate = 0.92;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+/* ================= 题目数据 ================= */
+const SHAPES = {'□':'#2f7fd1','△':'#e8842c','☆':'#8e5bd1','○':'#2fa35a'};
+
+const EXAMPLE = {
+  vars:['□','△','☆'],
+  eqs:['□ + □ = 12','△ + □ = 17','△ − ☆ − ☆ = 3'],
+  solve:[
+    {type:'double',    eq:0, sym:'□', S:12},
+    {type:'addSub',    eq:1, sym:'△', T:17, k:'□'},
+    {type:'doubleDiff',eq:2, sym:'☆', totalSym:'△', R:3},
+  ]
+};
+
+const PRACTICE = [
+  {vars:['□','☆'], eqs:['☆ − □ = 8','5 + □ = 9'], solve:[
+    {type:'addSub',   eq:1, sym:'□', T:9, k:5},
+    {type:'symMinus', eq:0, sym:'☆', k:'□', d:8}]},
+  {vars:['○','△'], eqs:['○ + ○ = 8','△ + ○ = 10'], solve:[
+    {type:'double', eq:0, sym:'○', S:8},
+    {type:'addSub', eq:1, sym:'△', T:10, k:'○'}]},
+  {vars:['□','△'], eqs:['□ + □ = 10','□ + △ = 9'], solve:[
+    {type:'double', eq:0, sym:'□', S:10},
+    {type:'addSub', eq:1, sym:'△', T:9, k:'□'}]},
+  {vars:['☆','○'], eqs:['☆ + ☆ = 14','☆ + ○ = 12'], solve:[
+    {type:'double', eq:0, sym:'☆', S:14},
+    {type:'addSub', eq:1, sym:'○', T:12, k:'☆'}]},
+  {vars:['△','□'], eqs:['△ + △ = 6','△ + □ = 11'], solve:[
+    {type:'double', eq:0, sym:'△', S:6},
+    {type:'addSub', eq:1, sym:'□', T:11, k:'△'}]},
+  {vars:['○','□'], eqs:['○ + ○ + ○ = 9','○ + □ = 7'], solve:[
+    {type:'triple', eq:0, sym:'○', S:9},
+    {type:'addSub', eq:1, sym:'□', T:7, k:'○'}]},
+  {vars:['□','△','☆'], eqs:['□ + □ = 12','△ + □ = 15','△ − ☆ = 2'], solve:[
+    {type:'double',  eq:0, sym:'□', S:12},
+    {type:'addSub',  eq:1, sym:'△', T:15, k:'□'},
+    {type:'subKnown',eq:2, sym:'☆', k:'△', d:2}]},
+  {vars:['○','△','☆'], eqs:['○ + ○ = 16','○ + △ = 11','△ + ☆ = 12'], solve:[
+    {type:'double', eq:0, sym:'○', S:16},
+    {type:'addSub', eq:1, sym:'△', T:11, k:'○'},
+    {type:'addSub', eq:2, sym:'☆', T:12, k:'△'}]},
+  {vars:['☆','□','○'], eqs:['☆ + ☆ = 18','□ + ☆ = 13','□ − ○ = 2'], solve:[
+    {type:'double',  eq:0, sym:'☆', S:18},
+    {type:'addSub',  eq:1, sym:'□', T:13, k:'☆'},
+    {type:'subKnown',eq:2, sym:'○', k:'□', d:2}]},
+  {vars:['△','○','□'], eqs:['△ + △ = 4','△ + ○ = 12','○ + □ = 15'], solve:[
+    {type:'double', eq:0, sym:'△', S:4},
+    {type:'addSub', eq:1, sym:'○', T:12, k:'△'},
+    {type:'addSub', eq:2, sym:'□', T:15, k:'○'}]},
 ];
 
-function problemText(p){
-  return `${p.a} 有 ${p.n} 个${p.item}，${p.b} 再${p.verb} ${p.g} 个就${p.a}一样多了，请问 ${p.b} 现在有几个${p.item}？`;
-}
-
-// ===== 语音 =====
-let soundOn = true;
-const soundBtns = [];
-function refreshSoundBtns(){
-  soundBtns.forEach(b => b.textContent = '🔊 声音：' + (soundOn ? '开' : '关'));
-}
-function toggleSound(){
-  soundOn = !soundOn;
-  refreshSoundBtns();
-  if(!soundOn && window.speechSynthesis) window.speechSynthesis.cancel();
-}
-let zhVoice = null;
-function pickVoice(){
-  if(!window.speechSynthesis) return;
-  const vs = speechSynthesis.getVoices();
-  zhVoice = vs.find(v => /zh|Chinese|普通话|Yue|Mandarin/i.test(v.lang + v.name)) || null;
-}
-if(window.speechSynthesis){
-  pickVoice();
-  speechSynthesis.onvoiceschanged = pickVoice;
-}
-
-function speak(text, cb){
-  if(soundOn && window.speechSynthesis){
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'zh-CN'; u.rate = 0.92; u.pitch = 1.05;
-    if(zhVoice) u.voice = zhVoice;
-    u.onend = () => cb && cb();
-    speechSynthesis.speak(u);
-  } else {
-    setTimeout(() => cb && cb(), 400);
-  }
-}
-
-// ===== 物品渲染（支持不同 emoji）=====
-function renderTray(el, count, given, emoji){
-  el.innerHTML = '';
-  if(count === '?' || count == null){
-    el.innerHTML = '<span class="question-mark">?</span>';
-    return;
-  }
-  for(let i=0;i<count;i++){
-    const c = document.createElement('div');
-    c.className = 'candy' + (i < given ? ' given' : '');
-    c.textContent = emoji || '🍬';
-    el.appendChild(c);
-  }
-}
-
-function pulse(el){
-  if(el.animate) el.animate([{transform:'scale(1)'},{transform:'scale(1.06)'},{transform:'scale(1)'}],{duration:450});
-}
-
-// ===== 步骤生成（每步带算式，只用于讲解逻辑）=====
-// 新题型：A 有 n 个，B 再补 g 个就 = A，求 B 现在有几个  => B = n - g
-function buildSteps(p, ui){
-  const { a, b, item, emoji, n, g, verb } = p;
-  const ans = n - g; // B 现在有的
-  return [
-    { text:`题目说：<b>${a} 有 ${n} 个${item}</b>。先把 ${a} 的 ${n} 个${item}摆出来。`,
-      calc:'',
-      run:()=>{ renderTray(ui.aTray,n,0,emoji); ui.aBadge.textContent=n+' 个'; renderTray(ui.bTray,'?',0,emoji); ui.bBadge.textContent='？'; } },
-    { text:`题目又说：${b} 再${verb} <b>${g} 个</b>，就${p.a}一样多了。这说明 ${b} 现在比 ${a} 少 <b>${g} 个</b>（蓝圈圈出的，就是 ${b} 还差的数量）。`,
-      calc:'',
-      run:()=>{ renderTray(ui.aTray,n,g,emoji); ui.aBadge.textContent=n+' 个'; renderTray(ui.bTray,'?',0,emoji); ui.bBadge.textContent='？'; pulse(ui.aTray); } },
-    { text:`${a} 有 ${n} 个，${b} 比 ${a} 少 ${g} 个，那 ${b} 就是 ${n} 减 ${g}。`,
-      calc:`${n} − ${g} = ${ans}`,
-      run:()=>{ renderTray(ui.aTray,n,0,emoji); ui.aBadge.textContent=n+' 个'; renderTray(ui.bTray,ans,0,emoji); ui.bBadge.textContent=ans+' 个'; pulse(ui.bTray); } },
-    { text:`所以 ${b} 现在有 <b>${ans} 个</b>${item}！🎉`,
-      calc:`${b} 现在 = ${n} − ${g} = ${ans}`,
-      run:()=>{ renderTray(ui.bTray,ans,0,emoji); ui.bBadge.textContent='现在有 '+ans+' 个'; pulse(ui.bTray); } },
-  ];
-}
-
-// ===== 动画播放器组件：在任何容器里生成一套完整讲解舞台 =====
-let playGen = 0; // 全局代际：新播放会让旧的播放链失效
-function makePlayer(container, p, opts){
-  opts = opts || {};
-  const full = !!opts.fullControls;
-  container.innerHTML = `
-    <div class="problem-card"><span class="tag">题目</span><span class="ptext"></span></div>
-    <div class="persons">
-      <div class="person">
-        <div class="avatar">🧒</div>
-        <div class="pname aname"></div>
-        <div class="badge abadge"></div>
-        <div class="tray atray"></div>
-      </div>
-      <div class="person">
-        <div class="avatar">👧</div>
-        <div class="pname bname"></div>
-        <div class="badge bbadge"></div>
-        <div class="tray btray"></div>
-      </div>
-    </div>
-    <div class="controls">
-      <button class="btn-play bplay">▶ 播放讲解（带语音）</button>
-      <button class="btn-step bnext">下一步</button>
-      <button class="btn-reset breset">重来</button>
-      ${full ? '<button class="btn-step bsound">🔊 声音：开</button>' : ''}
-    </div>
-    <div class="subtitle stext"></div>
-    <div class="calc-board cboard"></div>`;
-
-  container.querySelector('.ptext').textContent = problemText(p);
-  container.querySelector('.aname').textContent = p.a;
-  container.querySelector('.bname').textContent = p.b;
-
-  const ui = {
-    aTray:  container.querySelector('.atray'),
-    bTray:  container.querySelector('.btray'),
-    aBadge: container.querySelector('.abadge'),
-    bBadge: container.querySelector('.bbadge'),
-    stext:  container.querySelector('.stext'),
-    cboard: container.querySelector('.cboard'),
-  };
-
-  const steps = buildSteps(p, ui);
-  let cur = -1, playing = false;
-
-  function applyStep(i){
-    if(i < 0 || i >= steps.length) return;
-    cur = i;
-    ui.stext.innerHTML = steps[i].text;
-    if(steps[i].calc){
-      ui.cboard.innerHTML = '<span class="clabel">🧮 这一步的算式</span>' + steps[i].calc;
-      ui.cboard.style.visibility = 'visible';
-    } else {
-      ui.cboard.style.visibility = 'hidden';
+/* ================= 生成讲解步骤 ================= */
+function buildSteps(p){
+  const known = {};
+  const steps = [];
+  steps.push({eq:-1, solve:null,
+    sub:'下面算式里的图形各表示几？别怕，我们像小侦探一样，一条一条解开！',
+    calc:'先找最容易解的算式',
+    say:'下面算式里的图形各表示几？别怕，我们像小侦探一样，一条一条解开！'});
+  p.solve.forEach(s=>{
+    let step;
+    if(s.type==='double'){
+      const h = s.S/2; known[s.sym]=h;
+      step = {sub:`两个 ${s.sym} 一模一样，合起来是 ${s.S}`, solve:[s.sym,h],
+        calc:`${h} + ${h} = ${s.S}，所以 ${s.sym} = ${h}`,
+        say:`两个${s.sym}一模一样，${h}加${h}等于${s.S}，所以${s.sym}是${h}！`};
+    } else if(s.type==='triple'){
+      const t = s.S/3; known[s.sym]=t;
+      step = {sub:`三个 ${s.sym} 一模一样，合起来是 ${s.S}`, solve:[s.sym,t],
+        calc:`${t} + ${t} + ${t} = ${s.S}，所以 ${s.sym} = ${t}`,
+        say:`三个${s.sym}一模一样，${t}加${t}再加${t}等于${s.S}，所以${s.sym}是${t}！`};
+    } else if(s.type==='addSub'){
+      const kv = (typeof s.k==='number') ? s.k : known[s.k];
+      const x = s.T - kv; known[s.sym]=x;
+      step = {sub:`把 ${s.k} 换成 ${kv}：${s.sym} + ${kv} = ${s.T}`, solve:[s.sym,x],
+        calc:`${s.T} − ${kv} = ${x}，所以 ${s.sym} = ${x}`,
+        say:`${s.sym}加${kv}等于${s.T}，用${s.T}减${kv}，等于${x}，所以${s.sym}是${x}！`};
+    } else if(s.type==='subKnown'){
+      const kv = (typeof s.k==='number') ? s.k : known[s.k];
+      const x = kv - s.d; known[s.sym]=x;
+      step = {sub:`把 ${s.k} 换成 ${kv}：${kv} − ${s.sym} = ${s.d}`, solve:[s.sym,x],
+        calc:`${kv} − ${s.d} = ${x}，所以 ${s.sym} = ${x}`,
+        say:`${kv}减去${s.sym}还剩${s.d}，所以${s.sym}是${kv}减${s.d}，等于${x}！`};
+    } else if(s.type==='symMinus'){
+      const kv = (typeof s.k==='number') ? s.k : known[s.k];
+      const x = kv + s.d; known[s.sym]=x;
+      step = {sub:`把 ${s.k} 换成 ${kv}：${s.sym} − ${kv} = ${s.d}`, solve:[s.sym,x],
+        calc:`${kv} + ${s.d} = ${x}，所以 ${s.sym} = ${x}`,
+        say:`${s.sym}减去${kv}还剩${s.d}，所以${s.sym}是${kv}加${s.d}，等于${x}！`};
+    } else if(s.type==='doubleDiff'){
+      const T = known[s.totalSym];
+      const S = T - s.R, h = S/2; known[s.sym]=h;
+      step = {sub:`把 ${s.totalSym} 换成 ${T}：${T} − ${s.sym} − ${s.sym} = ${s.R}`, solve:[s.sym,h],
+        calc:`两个 ${s.sym} 合起来：${T} − ${s.R} = ${S}\n${h} + ${h} = ${S}，所以 ${s.sym} = ${h}`,
+        say:`${s.totalSym}是${T}，从${T}减到${s.R}，一共减掉了${S}，两个${s.sym}合起来就是${S}。${h}加${h}等于${S}，所以${s.sym}是${h}！`};
     }
-    steps[i].run();
+    step.eq = s.eq;
+    steps.push(step);
+  });
+  const summary = p.vars.map(v=>`${v} = ${known[v]}`).join('，');
+  steps.push({eq:-2, solve:'all',
+    sub:`全部解开啦！${summary}`,
+    calc:`${summary}\n小侦探口诀：先解「两个一样的」，再代进别的算式！`,
+    say:`全部解开啦！${p.vars.map(v=>`${v}是${known[v]}`).join('，')}。记住小口诀：先解两个一样的，再代进别的算式！`});
+  return {steps, known};
+}
+
+/* ================= 播放器组件 ================= */
+function makePlayer(mount, p){
+  const {steps, known} = buildSteps(p);
+  mount.innerHTML = `
+    <div class="stage">
+      <div class="eqs">${p.eqs.map((e,i)=>`<div class="eq" data-i="${i}">${e}</div>`).join('')}</div>
+      <div class="tokens">${p.vars.map(v=>`
+        <span class="token" data-sym="${v}" style="border-color:${SHAPES[v]}88">
+          <b class="sym" style="color:${SHAPES[v]}">${v}</b><b class="val">?</b>
+        </span>`).join('')}</div>
+      <div class="subtitle"></div>
+      <div class="calc"></div>
+      <div class="ctrl">
+        <button class="btn play">▶ 播放讲解（带语音）</button>
+        <button class="btn blue next">下一步</button>
+        <button class="btn gray reset">↺ 重来</button>
+        <button class="btn orange snd">🔊 声音开</button>
+      </div>
+    </div>`;
+  const q = sel => mount.querySelector(sel);
+  const eqEls = mount.querySelectorAll('.eq');
+  const tokEls = mount.querySelectorAll('.token');
+  let idx = -1, timer = null, playing = false;
+
+  function show(i){
+    eqEls.forEach(el=>el.classList.remove('hl'));
+    if(i<0){ q('.subtitle').textContent='点「播放讲解」或「下一步」，跟着动画一起破案～';
+      q('.calc').textContent=''; return; }
+    const st = steps[i];
+    if(st.eq>=0) eqEls[st.eq].classList.add('hl');
+    if(st.eq===-2) eqEls.forEach(el=>el.classList.add('done'));
+    q('.subtitle').textContent = st.sub;
+    q('.calc').textContent = st.calc;
+    if(st.solve==='all'){
+      tokEls.forEach(t=>t.classList.add('solved'));
+    } else if(st.solve){
+      const t = mount.querySelector(`.token[data-sym="${st.solve[0]}"]`);
+      t.classList.add('solved');
+      t.querySelector('.val').textContent = st.solve[1];
+    }
+    speak(st.say);
+  }
+  function next(){
+    if(idx >= steps.length-1) return;
+    idx++; show(idx);
   }
   function reset(){
-    playing = false;
-    if(window.speechSynthesis) window.speechSynthesis.cancel();
-    cur = -1;
-    ui.stext.innerHTML = '先看看上面的<b>题目</b>，再点「播放讲解」，跟着动画和声音一起学～';
-    ui.cboard.style.visibility = 'hidden';
-    renderTray(ui.aTray, p.n, 0, p.emoji); ui.aBadge.textContent = p.n + ' 个';
-    renderTray(ui.bTray, '?', 0, p.emoji); ui.bBadge.textContent = '？';
+    stopPlay(); idx = -1;
+    tokEls.forEach(t=>{t.classList.remove('solved'); t.querySelector('.val').textContent='?';});
+    eqEls.forEach(el=>el.classList.remove('hl','done'));
+    show(-1);
+  }
+  function stopPlay(){
+    if(timer){ clearInterval(timer); timer=null; }
+    if(playing){ playing=false; q('.play').textContent='▶ 播放讲解（带语音）'; }
+    if('speechSynthesis' in window) try{speechSynthesis.cancel();}catch(e){}
   }
   function play(){
-    playing = true;
-    const gen = ++playGen; // 让其它播放器的旧链失效
-    if(window.speechSynthesis) window.speechSynthesis.cancel();
-    reset();
-    playing = true;
-    let i = 0;
-    const seq = () => {
-      if(!playing || gen !== playGen) return;
-      applyStep(i);
-      const txt = steps[i].text.replace(/<[^>]+>/g,'');
-      speak(txt, () => {
-        if(!playing || gen !== playGen) return;
-        i++;
-        if(i < steps.length){ setTimeout(seq, 350); }
-        else { playing = false; }
-      });
-    };
-    seq();
+    if(playing){ stopPlay(); return; }
+    if(idx >= steps.length-1) reset();
+    playing = true; q('.play').textContent='⏸ 暂停';
+    next();
+    timer = setInterval(()=>{ if(idx>=steps.length-1){ stopPlay(); } else next(); }, 4200);
   }
-
-  container.querySelector('.bplay').onclick  = () => play();
-  container.querySelector('.bnext').onclick  = () => { if(cur < steps.length - 1) applyStep(cur + 1); };
-  container.querySelector('.breset').onclick = () => reset();
-  if(full){
-    const sb = container.querySelector('.bsound');
-    soundBtns.push(sb);
-    sb.onclick = () => { toggleSound(); };
-  }
-
-  reset();
-  return { play, reset };
-}
-
-// ===== 顶部示例讲解 =====
-makePlayer(document.getElementById('stageRoot'), DEMO, { fullControls:true });
-
-// ===== 训练题列表：每题下方就地展开动画 =====
-const qlist = document.getElementById('qlist');
-const miniWraps = [], miniBtns = [];
-let openIdx = -1;
-
-function closeMini(){
-  if(openIdx < 0) return;
-  playGen++; // 停掉正在播的讲解
-  if(window.speechSynthesis) window.speechSynthesis.cancel();
-  miniWraps[openIdx].style.display = 'none';
-  miniBtns[openIdx].textContent = '▶ 播放讲解过程';
-  openIdx = -1;
-}
-
-problems.forEach((p, idx)=>{
-  const ans = p.n - p.g;
-  const div = document.createElement('div');
-  div.className = 'qitem';
-  div.innerHTML =
-    `<div class="qhead"><span class="qnum">${idx+1}）</span>` +
-    `<span class="qtext">${p.a} 有 <b>${p.n}</b> 个${p.item}，${p.b} 再${p.verb} <b>${p.g}</b> 个就${p.a}一样多。${p.b} 现在有几个？</span></div>` +
-    `<div class="qctrl">` +
-      `<button class="btn-play-sm">▶ 播放讲解过程</button>` +
-      `<span class="ans" style="display:none;">答：${p.b} 现在有 <b>${ans}</b> 个。</span>` +
-    `</div>`;
-  const wrap = document.createElement('div');
-  wrap.className = 'mini-wrap';
-  div.appendChild(wrap);
-  qlist.appendChild(div);
-
-  const btn = div.querySelector('.btn-play-sm');
-  miniWraps[idx] = wrap; miniBtns[idx] = btn;
-  btn.onclick = () => {
-    if(openIdx === idx){ closeMini(); return; }   // 再点一次收起
-    closeMini();                                   // 收起其它已展开的
-    openIdx = idx;
-    wrap.style.display = 'block';
-    makePlayer(wrap, p).play();                    // 展开后自动播放
-    btn.textContent = '■ 收起讲解';
-    setTimeout(() => wrap.scrollIntoView({behavior:'smooth', block:'nearest'}), 80);
-  };
-});
-
-function toggleAnswers(){
-  document.querySelectorAll('.ans').forEach(a=>{
-    a.style.display = a.style.display === 'none' ? 'inline' : 'none';
+  q('.play').addEventListener('click', play);
+  q('.next').addEventListener('click', ()=>{ stopPlay(); next(); });
+  q('.reset').addEventListener('click', reset);
+  q('.snd').addEventListener('click', function(){
+    soundOn = !soundOn;
+    this.textContent = soundOn ? '🔊 声音开' : '🔇 声音关';
+    if(!soundOn && 'speechSynthesis' in window) try{speechSynthesis.cancel();}catch(e){}
   });
+  show(-1);
+  return {steps, known};
 }
+
+/* ================= 渲染页面 ================= */
+makePlayer(document.getElementById('exStage'), EXAMPLE);
+
+const prWrap = document.getElementById('practice');
+let openStage = null;
+PRACTICE.forEach((p,i)=>{
+  const ans = buildSteps(p).known;
+  const ansText = p.vars.map(v=>`${v} = ${ans[v]}`).join('，');
+  const item = document.createElement('div');
+  item.className = 'p-item';
+  item.innerHTML = `
+    <div class="p-head">
+      <span class="p-no">${i+1}</span>
+      <div class="p-eqs">${p.eqs.join('<br>')}</div>
+    </div>
+    <div class="p-btns">
+      <button class="btn playBtn">▶ 播放讲解过程</button>
+      <button class="btn blue ansBtn">显示答案</button>
+    </div>
+    <div class="p-ans">${ansText}</div>
+    <div class="p-stage"></div>`;
+  prWrap.appendChild(item);
+  const stage = item.querySelector('.p-stage');
+  const playBtn = item.querySelector('.playBtn');
+  const ansBtn = item.querySelector('.ansBtn');
+  let player = null;
+  playBtn.addEventListener('click', ()=>{
+    if(stage.classList.contains('show')){
+      stage.classList.remove('show'); playBtn.textContent='▶ 播放讲解过程';
+      if('speechSynthesis' in window) try{speechSynthesis.cancel();}catch(e){}
+      return;
+    }
+    if(openStage && openStage!==stage){
+      openStage.classList.remove('show');
+      openStage.parentNode.querySelector('.playBtn').textContent='▶ 播放讲解过程';
+    }
+    openStage = stage;
+    if(!player) player = makePlayer(stage, p);
+    stage.classList.add('show');
+    playBtn.textContent='■ 收起讲解';
+    stage.scrollIntoView({behavior:'smooth', block:'nearest'});
+  });
+  ansBtn.addEventListener('click', function(){
+    const a = item.querySelector('.p-ans');
+    a.classList.toggle('show');
+    this.textContent = a.classList.contains('show') ? '隐藏答案' : '显示答案';
+  });
+});
 </script>
 </body>
 </html>
